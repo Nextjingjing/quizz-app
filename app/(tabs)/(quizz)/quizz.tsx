@@ -29,6 +29,7 @@ export default function Quizz() {
   useEffect(() => {
     console.log(selectedAnswers);
   }, [selectedAnswers]);
+  
 
   const calculateScore = () => {
     const totalScore = selectedAnswers.reduce((acc, answer, index) => {
