@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Pressable } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Pressable, Modal } from 'react-native';
 import QuizzCom from '@/components/QuizzCom';
 import Timer from '@/components/Timer';
-import { Link } from 'expo-router'; // Import Link
 
-// ข้อมูลคำถาม
+// ข้อมูลคำถามและคำตอบที่ถูกต้อง
 const data = [
-  { question: 'What is the capital of France?', choices: ['Paris', 'London', 'Berlin', 'Madrid']},
-  { question: 'What is 2 + 2?', choices: ['3', '4', '5', '6'] }
+  { question: 'What is the capital of France?', choices: ['Paris', 'London', 'Berlin', 'Madrid'], correctAnswer: 'Paris' },
+  { question: 'What is 2 + 2?', choices: ['3', '4', '5', '6'], correctAnswer: '4' }
 ];
 
 const ITEMS_PER_PAGE = 1;
@@ -15,6 +14,8 @@ const ITEMS_PER_PAGE = 1;
 export default function Quizz() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedAnswers, setSelectedAnswers] = useState<(string | null)[]>(Array(data.length).fill(null));
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [score, setScore] = useState(0);
 
   const currentData = data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
@@ -28,6 +29,18 @@ export default function Quizz() {
   useEffect(() => {
     console.log(selectedAnswers);
   }, [selectedAnswers]);
+
+  const calculateScore = () => {
+    const totalScore = selectedAnswers.reduce((acc, answer, index) => {
+      return answer === data[index].correctAnswer ? acc + 1 : acc;
+    }, 0);
+    setScore(totalScore);
+  };
+
+  const handleSubmit = () => {
+    calculateScore();
+    setIsModalVisible(true);
+  };
 
   return (
     <View style={styles.container}>
@@ -70,13 +83,33 @@ export default function Quizz() {
         }
       />
       
-      <Link href="/result" asChild>
-        <Pressable style={selectedAnswers.some(element => element === null)? styles.disableButton : styles.button } disabled={selectedAnswers.some(element => element === null)}>
-          <Text style={styles.buttonText}>Submit</Text>
-        </Pressable>
-      </Link>
+      <Pressable
+        style={selectedAnswers.some(element => element === null) ? styles.disableButton : styles.button}
+        disabled={selectedAnswers.some(element => element === null)}
+        onPress={handleSubmit}
+      >
+        <Text style={styles.buttonText}>Submit</Text>
+      </Pressable>
 
       <Timer />
+
+      {/* Modal for displaying the score */}
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Quiz Score</Text>
+            <Text style={styles.modalText}>You scored {score} out of {data.length}</Text>
+            <Pressable style={styles.modalButton} onPress={() => setIsModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Close</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -137,5 +170,37 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center', 
     fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  modalButton: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
