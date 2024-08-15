@@ -92,7 +92,7 @@ export default function Quizz() {
         <Text style={styles.buttonText}>Submit</Text>
       </Pressable>
 
-      <Timer/>
+      <Timer />
 
       {/* Modal for displaying the score */}
       <Modal
