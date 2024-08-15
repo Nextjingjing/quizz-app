@@ -3,18 +3,20 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Pressab
 import QuizzCom from '@/components/QuizzCom';
 import Timer from '@/components/Timer';
 import { Link } from 'expo-router'; // Import Link
-
-// ข้อมูลคำถาม
-const data = [
-  { question: 'What is the capital of France?', choices: ['Paris', 'London', 'Berlin', 'Madrid']},
-  { question: 'What is 2 + 2?', choices: ['3', '4', '5', '6'] }
-];
+import questionsData from '@/assets/quizz.json'; // Import JSON file
 
 const ITEMS_PER_PAGE = 1;
 
 export default function Quizz() {
+  const [data, setData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedAnswers, setSelectedAnswers] = useState<(string | null)[]>(Array(data.length).fill(null));
+  const [selectedAnswers, setSelectedAnswers] = useState([]);
+
+  useEffect(() => {
+    // Load data from JSON
+    setData(questionsData);
+    setSelectedAnswers(Array(questionsData.length).fill(null));
+  }, []);
 
   const currentData = data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
@@ -139,3 +141,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
