@@ -3,19 +3,79 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, ScrollView, Pressab
 import QuizzCom from '@/components/QuizzCom';
 import Timer from '@/components/Timer';
 
-// ข้อมูลคำถามและคำตอบที่ถูกต้อง
-const data = [
-  { question: 'What is the capital of France?', choices: ['Paris', 'London', 'Berlin', 'Madrid'], correctAnswer: 'Paris' },
-  { question: 'What is 2 + 2?', choices: ['3', '4', '5', '6'], correctAnswer: '4' }
-];
-
 const ITEMS_PER_PAGE = 1;
 
 export default function Quizz() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedAnswers, setSelectedAnswers] = useState<(string | null)[]>(Array(data.length).fill(null));
+  const [selectedAnswers, setSelectedAnswers] = useState<(string | null)[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [score, setScore] = useState(0);
+  const [data, setData] = useState<{ question: string; choices: string[]; correctAnswer: string }[]>([]);
+
+  useEffect(() => {
+    const fetchFileContent = async () => {
+      try {
+        const response = await fetch('/test.txt'); // Adjust the path as needed
+        if (response.ok) {
+          const content = await response.text();
+          const parsedData = parseQuizData(content);
+          setData(parsedData);
+
+          console.log(parsedData);
+          
+          setSelectedAnswers(Array(parsedData.length).fill(null));
+        } else {
+          console.error('Failed to fetch file:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching file:', error);
+      }
+    };
+
+    fetchFileContent();
+  }, []);
+
+  const parseQuizData = (content: string) => {
+    const lines = content.split('\n');
+    const quizData = [];
+    let currentQuestion = '';
+    let choices = [];
+    let correctAnswer = '';
+  
+    lines.forEach((line) => {
+      line = line.trim();
+
+      if (line.startsWith('$Q: ')) {
+        if (currentQuestion) {
+          quizData.push({
+            question: currentQuestion,
+            choices: [...choices],  // ensure a new array is pushed
+            correctAnswer,
+          });
+          choices = [];
+          correctAnswer = '';
+        }
+        currentQuestion = line.substring(4);
+      } else if (line.startsWith('$A: ')) {
+        choices.push(line.substring(4));
+      } else if (line.startsWith('$C: ')) {
+
+        correctAnswer = line.substring(4);
+      }
+    });
+  
+    // Push the last question after the loop ends
+    if (currentQuestion) {
+      quizData.push({
+        question: currentQuestion,
+        choices: [...choices],  // ensure a new array is pushed
+        correctAnswer,
+      });
+    }
+  
+    return quizData;
+  };
+  
 
   const currentData = data.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
@@ -29,7 +89,6 @@ export default function Quizz() {
   useEffect(() => {
     console.log(selectedAnswers);
   }, [selectedAnswers]);
-  
 
   const calculateScore = () => {
     const totalScore = selectedAnswers.reduce((acc, answer, index) => {
@@ -83,18 +142,17 @@ export default function Quizz() {
           </View>
         }
       />
-      
+
       <Pressable
-        style={selectedAnswers.some(element => element === null) ? styles.disableButton : styles.button}
-        disabled={selectedAnswers.some(element => element === null)}
+        style={selectedAnswers.some((element) => element === null) ? styles.disableButton : styles.button}
+        disabled={selectedAnswers.some((element) => element === null)}
         onPress={handleSubmit}
       >
         <Text style={styles.buttonText}>Submit</Text>
       </Pressable>
 
-      <Timer/>
-// hello
-      {/* Modal for displaying the score */}
+      <Timer />
+
       <Modal
         transparent={true}
         animationType="slide"
@@ -114,6 +172,8 @@ export default function Quizz() {
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {

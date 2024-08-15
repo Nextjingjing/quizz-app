@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   selectedChoiceButton: {
-    backgroundColor: '#0056b3',
+    backgroundColor: '#ff0000',
   },
   choiceText: {
     fontSize: 16,

@@ -1,0 +1,34 @@
+$Q: What is 2 + 2?
+$A: 3
+$A: 4
+$A: 5
+$A: 6
+$C: 4
+
+$Q: What is the capital of France?
+$A: Paris
+$A: London
+$A: Berlin
+$A: Madrid
+$C: Paris
+
+$Q: Which planet is known as the Red Planet?
+$A: Earth
+$A: Mars
+$A: Jupiter
+$A: Venus
+$C: Mars
+
+$Q: Who wrote the play "Romeo and Juliet"?
+$A: William Shakespeare
+$A: Charles Dickens
+$A: Mark Twain
+$A: Jane Austen
+$C: William Shakespeare
+
+$Q: What is the largest ocean on Earth?
+$A: Atlantic Ocean
+$A: Indian Ocean
+$A: Arctic Ocean
+$A: Pacific Ocean
+$C: Pacific Ocean
