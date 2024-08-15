@@ -92,8 +92,8 @@ export default function Quizz() {
         <Text style={styles.buttonText}>Submit</Text>
       </Pressable>
 
-      <Timer />
-
+      <Timer/>
+// hello
       {/* Modal for displaying the score */}
       <Modal
         transparent={true}
@@ -202,6 +202,6 @@ const styles = StyleSheet.create({
   },
   modalButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
   },
 });
